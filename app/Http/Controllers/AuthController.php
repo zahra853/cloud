@@ -12,6 +12,7 @@ class AuthController extends Controller
     // FREE: halaman public
     public function __construct()
     {
+        // user yang sudah login cuma boleh akses logout
         $this->middleware('guest')->except(['logout']);
     }
 
@@ -88,12 +89,101 @@ class AuthController extends Controller
                 return redirect('/admin/user');
             }
 
-            return redirect('/homepage');
+            // user biasa ke homepage (route '/')
+            return redirect()->route('homepage');
         }
 
         return back()->withErrors([
             'login_error' => 'Email atau password salah!',
         ])->withInput();
+    }
+
+    // ======================
+    //  FORGOT PASSWORD + OTP
+    // ======================
+
+    // step 1: kirim OTP (sementara disimpan di session)
+    public function sendResetOtp(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user) {
+            return back()->withErrors([
+                'email' => 'Email tidak ditemukan.',
+            ]);
+        }
+
+        // generate OTP 6 digit
+        $otp = rand(100000, 999999);
+
+        // simpan di session (simple dulu)
+        session([
+            'reset_email' => $user->email,
+            'reset_otp'   => $otp,
+        ]);
+
+        // NOTE: di sini nanti bisa ditambah logic kirim email beneran
+        // logger('OTP reset password: '.$otp);
+
+        // 👉 SETELAH FORGOT → KE HALAMAN RESET PASSWORD (KIRI)
+        return redirect()
+            ->route('password.reset.form')
+            ->with('status', 'Silakan buat password baru.');
+    }
+
+    // step 2: update password (setelah isi form reset password – KIRI)
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $email = session('reset_email');
+
+        if (! $email) {
+            return redirect()
+                ->route('password.request')
+                ->withErrors(['email' => 'Session reset password tidak ditemukan.']);
+        }
+
+        $user = User::where('email', $email)->firstOrFail();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // 👉 habis ganti password, lanjut ke halaman VERIFY OTP (KANAN)
+        return redirect()
+            ->route('password.otp.form')
+            ->with('status', 'Password berhasil direset. Silakan verifikasi OTP.');
+    }
+
+    // step 3: verifikasi OTP (halaman kanan)
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'otp'   => 'required|array|size:6',
+            'otp.*' => 'required|digits:1',
+        ]);
+
+        $inputOtp   = implode('', $request->otp);
+        $sessionOtp = session('reset_otp');
+
+        if ($inputOtp !== $sessionOtp) {
+            return back()->withErrors([
+                'otp' => 'Kode OTP salah.',
+            ]);
+        }
+
+        // OTP benar → beresin session
+        session()->forget(['reset_otp']);
+
+        // selesai semua, balik ke login admin
+        return redirect()
+            ->route('login.admin')
+            ->with('status', 'Akun berhasil diverifikasi. Silakan login.');
     }
 
     // ======================

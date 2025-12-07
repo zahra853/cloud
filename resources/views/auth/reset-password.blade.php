@@ -39,15 +39,17 @@
         <img src="{{ asset('images/homepage/gambar2.png') }}" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-cafe-700 bg-opacity-40 backdrop-blur-sm"></div>
 
-        <!-- Back Button: balik ke halaman login (pilih role) -->
-        <a href="{{ url('/login') }}"
+        <!-- Back ke Forgot Password awal -->
+        {{-- ganti route('password.request') sesuai route forgot password punyamu --}}
+        <a href="{{ route('password.request') }}"
            class="absolute top-6 left-6 text-white text-3xl font-bold z-20">
             &larr;
         </a>
 
-        <!-- Text -->
         <div class="absolute inset-0 flex flex-col justify-center items-center text-white px-6">
-            <p class="text-center mt-2 font-medium">Semangat Admin<br>– Minlo imoet</p>
+            <p class="text-center mt-2 font-medium">
+                Silakan buat password baru yang lebih aman ✨
+            </p>
         </div>
     </div>
 
@@ -55,49 +57,40 @@
     <div class="bg-cafe-100 flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-xl p-10">
 
-            <!-- Icon -->
-            <div class="flex justify-center mb-4">
-                <img src="{{ asset('images/admin-icon.png') }}" class="w-14 h-14" />
-            </div>
+            <h2 class="text-center text-2xl font-bold text-cafe-700 mb-2">
+                RESET PASSWORD
+            </h2>
 
-            <h2 class="text-center text-2xl font-bold text-cafe-700">Login Admin</h2>
+            <p class="text-center text-sm text-gray-500 mb-8 leading-relaxed">
+                Enter the email associated with your account and we’ll send an email
+                with code to reset your password.
+            </p>
 
-            <form method="POST" action="{{ route('login.post') }}" class="mt-8">
+            {{-- action-nya ganti ke route update password punyamu --}}
+            <form method="POST" action="{{ route('password.update') }}">
                 @csrf
-
-                <input type="hidden" name="role" value="admin">
-
-                <!-- Email -->
-                <label class="text-sm text-gray-700">Email</label>
-                <input type="email" name="email"
-                    class="w-full bg-cafe-50 px-4 py-3 rounded-xl border border-cafe-300 mt-1 mb-4 focus:ring-2 focus:ring-cafe-500"
-                    required />
+                {{-- kalau pakai token reset bawaan Laravel, kirim token di sini --}}
+                {{-- <input type="hidden" name="token" value="{{ $token ?? '' }}"> --}}
 
                 <!-- Password -->
                 <label class="text-sm text-gray-700">Password</label>
                 <input type="password" name="password"
-                    class="w-full bg-cafe-50 px-4 py-3 rounded-xl border border-cafe-300 mt-1 mb-6 focus:ring-2 focus:ring-cafe-500"
-                    required />
+                       class="w-full bg-cafe-50 px-4 py-3 rounded-xl border border-cafe-300 mt-1 mb-4 focus:ring-2 focus:ring-cafe-500"
+                       placeholder="Text your Password"
+                       required />
+
+                <!-- Confirm Password -->
+                <label class="text-sm text-gray-700">Confirm Password</label>
+                <input type="password" name="password_confirmation"
+                       class="w-full bg-cafe-50 px-4 py-3 rounded-xl border border-cafe-300 mt-1 mb-6 focus:ring-2 focus:ring-cafe-500"
+                       placeholder="Text your Password"
+                       required />
 
                 <!-- Button -->
                 <button
                     class="w-full bg-cafe-500 text-white py-3 rounded-xl font-semibold hover:bg-cafe-700 transition">
-                    Login
+                    Confirm
                 </button>
-
-                <!-- Register -->
-                <p class="text-center mt-4 text-sm">
-                    Don't have an account?
-                    <a href="{{ route('register.admin') }}" class="text-cafe-700 font-semibold">Register</a>
-                </p>
-
-                <!-- Forgot Password -->
-                <p class="text-center mt-2 text-xs">
-                    <a href="{{ route('password.request') }}"
-                       class="text-cafe-500 font-semibold hover:underline">
-                        Forgot Password
-                    </a>
-                </p>
             </form>
 
         </div>

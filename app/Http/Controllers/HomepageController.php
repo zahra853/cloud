@@ -28,4 +28,13 @@ class HomepageController extends Controller
     public function about() {
         return view('user.about');
     }
+    public function location()
+    {
+        return view('user.location'); // sesuai nama file barusan
+    }
+    public function review()
+    {
+        return view('user.review');
+    }
+
 }

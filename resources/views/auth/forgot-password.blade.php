@@ -34,20 +34,19 @@
 
 <body class="h-screen grid grid-cols-1 md:grid-cols-2">
 
-    <!-- LEFT SIDE -->
+    <!-- LEFT SIDE (sama kayak login) -->
     <div class="relative hidden md:block">
         <img src="{{ asset('images/homepage/gambar2.png') }}" class="w-full h-full object-cover" />
         <div class="absolute inset-0 bg-cafe-700 bg-opacity-40 backdrop-blur-sm"></div>
 
-        <!-- Back Button: balik ke halaman login (pilih role) -->
-        <a href="{{ url('/login') }}"
+        <!-- Back Button: balik ke login admin -->
+        <a href="{{ route('login.admin') }}"
            class="absolute top-6 left-6 text-white text-3xl font-bold z-20">
             &larr;
         </a>
 
-        <!-- Text -->
         <div class="absolute inset-0 flex flex-col justify-center items-center text-white px-6">
-            <p class="text-center mt-2 font-medium">Semangat Admin<br>– Minlo imoet</p>
+            <p class="text-center mt-2 font-medium">Lupa password? Tenang, kita bantu reset 💌</p>
         </div>
     </div>
 
@@ -55,49 +54,31 @@
     <div class="bg-cafe-100 flex items-center justify-center p-6">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-xl p-10">
 
-            <!-- Icon -->
-            <div class="flex justify-center mb-4">
-                <img src="{{ asset('images/admin-icon.png') }}" class="w-14 h-14" />
-            </div>
+            <!-- Title -->
+            <h2 class="text-center text-2xl font-bold text-cafe-700 mb-2">
+                Forgot Password
+            </h2>
 
-            <h2 class="text-center text-2xl font-bold text-cafe-700">Login Admin</h2>
+            <p class="text-center text-sm text-gray-500 mb-8 leading-relaxed">
+                Enter the email associated with your account and we’ll send an email<br>
+                with a code to reset your password.
+            </p>
 
-            <form method="POST" action="{{ route('login.post') }}" class="mt-8">
+            <form method="POST" action="{{ route('password.email') }}">
                 @csrf
-
-                <input type="hidden" name="role" value="admin">
 
                 <!-- Email -->
                 <label class="text-sm text-gray-700">Email</label>
                 <input type="email" name="email"
-                    class="w-full bg-cafe-50 px-4 py-3 rounded-xl border border-cafe-300 mt-1 mb-4 focus:ring-2 focus:ring-cafe-500"
-                    required />
-
-                <!-- Password -->
-                <label class="text-sm text-gray-700">Password</label>
-                <input type="password" name="password"
-                    class="w-full bg-cafe-50 px-4 py-3 rounded-xl border border-cafe-300 mt-1 mb-6 focus:ring-2 focus:ring-cafe-500"
-                    required />
+                       class="w-full bg-cafe-50 px-4 py-3 rounded-xl border border-cafe-300 mt-1 mb-6 focus:ring-2 focus:ring-cafe-500"
+                       placeholder="Text your email"
+                       required />
 
                 <!-- Button -->
                 <button
                     class="w-full bg-cafe-500 text-white py-3 rounded-xl font-semibold hover:bg-cafe-700 transition">
-                    Login
+                    Confirm
                 </button>
-
-                <!-- Register -->
-                <p class="text-center mt-4 text-sm">
-                    Don't have an account?
-                    <a href="{{ route('register.admin') }}" class="text-cafe-700 font-semibold">Register</a>
-                </p>
-
-                <!-- Forgot Password -->
-                <p class="text-center mt-2 text-xs">
-                    <a href="{{ route('password.request') }}"
-                       class="text-cafe-500 font-semibold hover:underline">
-                        Forgot Password
-                    </a>
-                </p>
             </form>
 
         </div>

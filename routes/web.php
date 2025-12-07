@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/', [HomepageController::class, 'index'])->name('homepage');
+Route::get('/location', [HomepageController::class, 'location'])->name('location');
+Route::get('/review', [HomepageController::class, 'review'])->name('review');
 
 
 /*
@@ -37,6 +39,27 @@ Route::get('/register', function () {
 Route::get('/register/admin', [AuthController::class, 'registerAdmin'])->name('register.admin');
 Route::get('/register/user', [AuthController::class, 'registerUser'])->name('register.user');
 Route::post('/register', [AuthController::class, 'handleRegister'])->name('register.post');
+
+// ==== FORGOT PASSWORD FLOW ====
+// 1. Halaman input email (Forgot Password awal)
+Route::get('/password/forgot', function () {
+    return view('auth.forgot-password'); // resources/views/auth/forgot-password.blade.php
+})->name('password.request');
+
+// 2. Halaman Verify OTP
+Route::get('/password/otp', function () {
+    return view('auth.verify-otp'); // resources/views/auth/verify-otp.blade.php
+})->name('password.otp.form');
+
+// 3. Halaman Reset Password
+Route::get('/password/reset', function () {
+    return view('auth.reset-password'); // resources/views/auth/reset-password.blade.php
+})->name('password.reset.form');
+
+// (opsional: kalau mau beneran jalan backend-nya, ini POST-nya)
+Route::post('/password/forgot', [AuthController::class, 'sendResetOtp'])->name('password.email');
+Route::post('/password/otp', [AuthController::class, 'verifyOtp'])->name('otp.verify');
+Route::post('/password/reset', [AuthController::class, 'updatePassword'])->name('password.update');
 
 // logout
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -80,6 +103,7 @@ Route::prefix('/admin')->middleware(['auth', 'role:admin'])->group(function () {
 
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | PUBLIC MENU & BOOKING
@@ -106,7 +130,3 @@ Route::get('/book/detail/info', function () {
 Route::get('/book/confirmed', function () {
     return view('user.book-confirmed');    // resources/views/user/book-confirmed.blade.php
 })->name('book.confirmed');
-
-
-
-

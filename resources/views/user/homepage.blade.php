@@ -37,16 +37,21 @@
                 JOGLO LONTAR CAFE
             </div>
 
-            <!-- MENU -->
-            <div class="flex items-center justify-center flex-1">
-                <div class="bg-[#4E2C1C] text-white rounded-full px-10 py-3 flex items-center gap-10 text-sm font-semibold">
-                    <a href="/" class="hover:text-yellow-300">HOME</a>
-                    <a href="#learn" class="hover:text-yellow-300">LEARN</a>
-                    <a href="#about" class="hover:text-yellow-300">ABOUT US</a>
-                    <a href="#location" class="hover:text-yellow-300">LOCATION</a>
-                    <a href="#review" class="hover:text-yellow-300">REVIEW</a>
-                </div>
+        <!-- MENU -->
+        <div class="flex items-center justify-center flex-1">
+            <div class="bg-[#4E2C1C] text-white rounded-full px-10 py-3 flex items-center gap-10 text-sm font-semibold">
+                <a href="/" class="hover:text-yellow-300">HOME</a>
+                <a href="#learn" class="hover:text-yellow-300">LEARN</a>
+                <a href="#about" class="hover:text-yellow-300">ABOUT US</a>
+
+                <!-- UBAH INI -->
+
+                <a href="{{ route('review') }}" class="hover:text-yellow-300">REVIEW</a>
+                <a href="{{ route('location') }}" class="hover:text-yellow-300">LOCATION</a>
+
             </div>
+        </div>
+
 
             <!-- Right Icons -->
             <div class="flex items-center gap-6 text-white text-lg">
