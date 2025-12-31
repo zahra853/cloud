@@ -6,34 +6,24 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
     // FREE: halaman public
     public function __construct()
     {
-        // user yang sudah login cuma boleh akses logout
-        $this->middleware('guest')->except(['logout']);
+        // user yang sudah login cuma boleh akses logout dan google callback
+        $this->middleware('guest')->except(['logout', 'googleCallback']);
     }
 
     // ======================
-    //  VIEW SELECTOR
+    //  LOGIN VIEW
     // ======================
 
-    public function chooseRole()
+    public function showLogin()
     {
-        return view('auth.choose-role');
-    }
-
-    // LOGIN VIEW
-    public function loginAdmin()
-    {
-        return view('auth.login-admin');
-    }
-
-    public function loginUser()
-    {
-        return view('auth.login-user');
+        return view('auth.login');
     }
 
     // REGISTER VIEW
@@ -57,13 +47,13 @@ class AuthController extends Controller
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email',
             'password'  => 'required|min:7|confirmed',
-            'role'      => 'required|in:admin,user', // ROLE WAJIB DARI FORM
+            'role'      => 'sometimes|in:admin,user', // Optional, default to 'user'
         ]);
 
         $user = User::create([
             'name'      => $validated['name'],
             'email'     => $validated['email'],
-            'role'      => $validated['role'],  // role dari form
+            'role'      => $validated['role'] ?? 'user',  // default to user
             'password'  => Hash::make($validated['password']),
         ]);
 
@@ -85,12 +75,14 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             // redirect by role
-            if (Auth::user()->role === 'admin') {
-                return redirect('/admin/user');
+            $user = Auth::user();
+            
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
             }
 
-            // user biasa ke homepage (route '/')
-            return redirect()->route('homepage');
+            // user/member ke membership
+            return redirect()->route('membership.landing');
         }
 
         return back()->withErrors([
@@ -197,5 +189,64 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login')->with('success', 'Berhasil logout.');
+    }
+
+    // ======================
+    //  GOOGLE OAUTH
+    // ======================
+
+    /**
+     * Redirect to Google OAuth
+     */
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    /**
+     * Handle Google OAuth callback
+     */
+    public function googleCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+            
+            // Check if user already exists
+            $user = User::where('email', $googleUser->getEmail())->first();
+            
+            if ($user) {
+                // Update Google ID and avatar if not set
+                if (!$user->google_id) {
+                    $user->update([
+                        'google_id' => $googleUser->getId(),
+                        'avatar' => $googleUser->getAvatar(),
+                    ]);
+                }
+            } else {
+                // Create new user
+                $user = User::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'role' => 'user',
+                    'password' => null, // No password for Google users
+                ]);
+            }
+            
+            // Login the user
+            Auth::login($user);
+            
+            // Redirect based on role
+            if ($user->role === 'admin') {
+                return redirect()->route('admin.dashboard');
+            }
+            
+            return redirect()->route('membership.landing');
+            
+        } catch (\Exception $e) {
+            return redirect()->route('login')
+                ->withErrors(['google_error' => 'Gagal login dengan Google. Silakan coba lagi.']);
+        }
     }
 }

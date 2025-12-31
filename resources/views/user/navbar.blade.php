@@ -26,6 +26,14 @@
             <!-- RIGHT SIDE -->
             <div class="flex items-center space-x-4">
 
+                <!-- CART ICON -->
+                <a href="{{ route('user.cart.index') }}" class="relative p-2 text-gray-600 hover:text-gray-900">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        {{ session('cart') ? count(session('cart')) : 0 }}
+                    </span>
+                </a>
+
                 {{-- ================= IF LOGGED IN ================= --}}
                 @auth
                     <!-- PROFILE DROPDOWN BUTTON -->
@@ -45,21 +53,45 @@
                         <div class="px-4 py-3">
                             <span class="text-sm font-semibold text-gray-900">{{ Auth::user()->name }}</span>
                             <p class="text-sm text-gray-500 truncate">{{ Auth::user()->email }}</p>
+                            @if(Auth::user()->isActiveMember())
+                                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Member</span>
+                            @endif
                         </div>
 
                         <ul class="py-2 text-sm text-gray-700">
                             @if (Auth::user()->role == 'admin')
                                 <li>
-                                    <a href="/admin/user" class="block px-4 py-2 hover:bg-gray-100">
-                                        Admin Page
+                                    <a href="{{ route('admin.dashboard') }}" class="block px-4 py-2 hover:bg-gray-100">
+                                        <i class="fas fa-tachometer-alt mr-2"></i> Admin Dashboard
                                     </a>
                                 </li>
                             @endif
 
                             <li>
-                                <a href="/logout" class="block px-4 py-2 hover:bg-gray-100">
-                                    Log Out
+                                <a href="{{ route('user.profile') }}" class="block px-4 py-2 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i> My Profile
                                 </a>
+                            </li>
+                            
+                            <li>
+                                <a href="{{ route('user.orders') }}" class="block px-4 py-2 hover:bg-gray-100">
+                                    <i class="fas fa-shopping-bag mr-2"></i> My Orders
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="{{ route('user.bookings') }}" class="block px-4 py-2 hover:bg-gray-100">
+                                    <i class="fas fa-calendar mr-2"></i> My Bookings
+                                </a>
+                            </li>
+
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" class="block">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">
+                                        <i class="fas fa-sign-out-alt mr-2"></i> Log Out
+                                    </button>
+                                </form>
                             </li>
                         </ul>
                     </div>

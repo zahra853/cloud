@@ -13,74 +13,85 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Admin Account
         User::create([
-            "name"=> "admin",
+            "name" => "Admin",
             "email" => "admin@gmail.com",
             "role" => "admin",
             "password" => bcrypt("password"),
         ]);
+
+        // Guest Account (for testing)
         User::create([
-            "name"=> "sonia",
+            "name" => "Guest User",
+            "email" => "guest@gmail.com",
+            "role" => "guest",
+            "password" => bcrypt("password"),
+        ]);
+
+        // Regular Users/Members
+        User::create([
+            "name" => "Sonia",
             "email" => "sonia@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "yanto",
+            "name" => "Yanto",
             "email" => "yanto@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "yayuk",
+            "name" => "Yayuk",
             "email" => "yayuk@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "sugeng",
+            "name" => "Sugeng",
             "email" => "sugeng@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "prili",
+            "name" => "Prili",
             "email" => "prili@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "widi",
+            "name" => "Widi",
             "email" => "widi@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "agus",
+            "name" => "Agus",
             "email" => "agus@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "zaki",
+            "name" => "Zaki",
             "email" => "zaki@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "erlang",
+            "name" => "Erlang",
             "email" => "erlang@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "linda",
+            "name" => "Linda",
             "email" => "linda@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),
         ]);
         User::create([
-            "name"=> "khaila",
+            "name" => "Khaila",
             "email" => "khaila@gmail.com",
             "role" => "user",
             "password" => bcrypt("password"),

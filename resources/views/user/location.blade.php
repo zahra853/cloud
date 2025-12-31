@@ -234,9 +234,9 @@
                                 <div>
                                     <p class="font-semibold mb-1">Landmark</p>
                                     <ul class="list-disc list-inside text-xs md:text-sm">
-                                        <li>Near Universitas Negeri Surabaya (Unesa) Kampus Lidah Wetan.</li>
                                         <li>In the Lontar–Sambikerep neighborhood, West Surabaya.</li>
                                         <li>Look for our location along Jl. Raya Lontar, number 403.</li>
+                                        <li>Easy access from main road with ample parking space.</li>
                                     </ul>
                                 </div>
                             </div>

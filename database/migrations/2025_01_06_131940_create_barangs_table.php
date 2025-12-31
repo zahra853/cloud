@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('barangs', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
-            $table->string('price')->nullable();
-            $table->integer('discount')->nullable();
+            $table->string('name');
+            $table->decimal('price', 10, 2);
+            $table->integer('discount')->default(0);
             $table->text('description')->nullable();
             $table->string('image_url')->nullable();
+            $table->integer('stock')->default(0);
+            $table->string('category')->nullable();
+            $table->boolean('is_available')->default(true);
             $table->timestamps();
         });
     }

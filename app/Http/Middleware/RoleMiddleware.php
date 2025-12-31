@@ -14,11 +14,23 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (Auth::user()->role != $role) {
-            return redirect('/homepage');
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
+
+        $userRole = Auth::user()->role;
+        
+        // Support multiple roles (e.g., role:admin|user)
+        if (!in_array($userRole, $roles)) {
+            // Redirect based on user's actual role
+            if ($userRole === 'admin') {
+                return redirect()->route('user.index');
+            }
+            return redirect()->route('homepage');
+        }
+        
         return $next($request);
     }
 }
