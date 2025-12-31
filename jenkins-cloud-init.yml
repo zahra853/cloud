@@ -1,0 +1,80 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - openjdk-11-jdk
+  - wget
+  - curl
+  - git
+  - unzip
+  - software-properties-common
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+
+write_files:
+  - path: /tmp/install-jenkins.sh
+    permissions: '0755'
+    content: |
+      #!/bin/bash
+      
+      echo "🚀 Installing Jenkins..."
+      
+      # Add Jenkins repository
+      wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+      sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+      
+      # Update and install Jenkins
+      sudo apt-get update
+      sudo apt-get install -y jenkins
+      
+      # Start and enable Jenkins
+      sudo systemctl start jenkins
+      sudo systemctl enable jenkins
+      
+      # Install Docker
+      echo "🐳 Installing Docker..."
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+      echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+      sudo apt-get update
+      sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+      
+      # Add jenkins user to docker group
+      sudo usermod -aG docker jenkins
+      
+      # Install Docker Compose
+      sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      sudo chmod +x /usr/local/bin/docker-compose
+      
+      # Install PHP and Composer for Laravel
+      echo "🐘 Installing PHP and Composer..."
+      sudo add-apt-repository -y ppa:ondrej/php
+      sudo apt-get update
+      sudo apt-get install -y php8.2 php8.2-cli php8.2-common php8.2-mysql php8.2-zip php8.2-gd php8.2-mbstring php8.2-curl php8.2-xml php8.2-bcmath
+      
+      # Install Composer
+      curl -sS https://getcomposer.org/installer | php
+      sudo mv composer.phar /usr/local/bin/composer
+      sudo chmod +x /usr/local/bin/composer
+      
+      # Install Node.js and npm
+      echo "📦 Installing Node.js..."
+      curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+      sudo apt-get install -y nodejs
+      
+      # Install Azure CLI
+      echo "☁️ Installing Azure CLI..."
+      curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      
+      # Get Jenkins initial password
+      sleep 30
+      echo "🔑 Jenkins Initial Password:"
+      sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+      
+      echo "✅ Jenkins installation completed!"
+      echo "🌍 Access Jenkins at: http://$(curl -s ifconfig.me):8080"
+
+runcmd:
+  - /tmp/install-jenkins.sh
