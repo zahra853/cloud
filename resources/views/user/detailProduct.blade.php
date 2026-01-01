@@ -39,7 +39,7 @@
                             <span
                                 class="absolute top-4 left-4 bg-red-600 p-2 text-white font-semibold rounded-full">{{ $barang->discount }}%</span>
                         @endif
-                        <img src="http://127.0.0.1:8000{{ $barang->image_url }}" alt="Product {{ $barang->id }}"
+                        <img src="{{ asset($barang->image_url) }}" alt="Product {{ $barang->id }}"
                             class="w-full h-48 rounded-md object-contain bg-gray-100">
                         <div class="pt-2">
                             <h3 class="text-lg font-semibold">{{ $barang->name }}</h3>

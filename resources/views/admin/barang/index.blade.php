@@ -42,7 +42,7 @@
                         render: function(data) {
                             if (data) {
                                 return `
-                                <img src="http://127.0.0.1:8000${data}" class="h-14 w-14 object-cover"></img>
+                                <img src="${window.location.origin}${data}" class="h-14 w-14 object-cover"></img>
                                 `;
                             } else {
                                 return `<span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-400 rounded-full">kosong</span>`;

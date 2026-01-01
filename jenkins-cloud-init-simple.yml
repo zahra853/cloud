@@ -1,0 +1,20 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - openjdk-11-jdk
+  - wget
+  - curl
+  - git
+  - unzip
+
+runcmd:
+  - wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
+  - sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+  - sudo apt-get update
+  - sudo apt-get install -y jenkins
+  - sudo systemctl start jenkins
+  - sudo systemctl enable jenkins
+  - sleep 30
+  - sudo cat /var/lib/jenkins/secrets/initialAdminPassword > /tmp/jenkins-password.txt
