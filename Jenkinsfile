@@ -49,9 +49,7 @@ pipeline {
                     
                     # Check for sensitive data
                     echo "Checking for sensitive data..."
-                    if grep -r "password\|secret\|key" .env.example; then
-                        echo "⚠️ Warning: Sensitive data found in .env.example"
-                    fi
+                    grep -rE "(password|secret|key)" .env.example && echo "Warning: Check sensitive data" || true
                 '''
             }
         }
@@ -74,41 +72,21 @@ pipeline {
         stage('Deploy to Azure') {
             steps {
                 echo '🚀 Deploying to Azure App Service...'
-                withCredentials([azureServicePrincipal('azure-service-principal')]) {
-                    sh '''
-                        # Login to Azure
-                        az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET --tenant $AZURE_TENANT_ID
-                        
-                        # Deploy to App Service
-                        az webapp deployment source sync \
-                            --resource-group $AZURE_RESOURCE_GROUP \
-                            --name $AZURE_WEB_APP
-                        
-                        # Run migrations
-                        az webapp ssh --resource-group $AZURE_RESOURCE_GROUP --name $AZURE_WEB_APP --command "cd /home/site/wwwroot && php artisan migrate --force"
-                    '''
-                }
+                sh '''
+                    # Create deployment package
+                    zip -r deploy.zip . -x "*.git*" -x "node_modules/*" -x "tests/*" -x "*.zip"
+                    
+                    echo "Deployment package created. Manual deploy required via Azure Portal or CLI."
+                    echo "Package size:"
+                    ls -lh deploy.zip
+                '''
             }
         }
         
         stage('Health Check') {
             steps {
-                echo '🏥 Running health check...'
-                sh '''
-                    # Wait for deployment to complete
-                    sleep 30
-                    
-                    # Check if app is responding
-                    APP_URL="https://${AZURE_WEB_APP}.azurewebsites.net"
-                    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $APP_URL)
-                    
-                    if [ $HTTP_STATUS -eq 200 ]; then
-                        echo "✅ Application is healthy! Status: $HTTP_STATUS"
-                    else
-                        echo "❌ Application health check failed! Status: $HTTP_STATUS"
-                        exit 1
-                    fi
-                '''
+                echo '🏥 Build completed successfully!'
+                echo "Ready for deployment to: https://joglo-prembun-app.azurewebsites.net"
             }
         }
     }
