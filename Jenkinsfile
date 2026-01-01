@@ -69,18 +69,20 @@ pipeline {
         stage('Deploy to Azure') {
             steps {
                 echo '🚀 Deploying to Azure App Service...'
-                sh '''
-                    # Create deployment package
-                    zip -r deploy.zip . -x "*.git*" -x "node_modules/*" -x "tests/*" -x "*.zip"
-                    
-                    echo "Deploying to Azure App Service..."
-                    curl -X POST \
-                        -u "$joglo-prembun-app:fiz0nZz1LAhdxzeL0hhBP4ZspS5o1clMfsmTyXDk0jTyTkJCHWD83Kmk72QJ" \
-                        --data-binary @deploy.zip \
-                        "https://joglo-prembun-app.scm.azurewebsites.net/api/zipdeploy"
-                    
-                    echo "Deployment completed!"
-                '''
+                withCredentials([usernamePassword(credentialsId: 'azure-deploy-creds', usernameVariable: 'AZURE_USER', passwordVariable: 'AZURE_PASS')]) {
+                    sh '''
+                        # Create deployment package
+                        zip -r deploy.zip . -x "*.git*" -x "node_modules/*" -x "tests/*" -x "*.zip"
+                        
+                        echo "Deploying to Azure App Service..."
+                        curl -X POST \
+                            -u "$AZURE_USER:$AZURE_PASS" \
+                            --data-binary @deploy.zip \
+                            "https://joglo-prembun-app.scm.azurewebsites.net/api/zipdeploy"
+                        
+                        echo "Deployment completed!"
+                    '''
+                }
             }
         }
         
