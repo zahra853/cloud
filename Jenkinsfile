@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         AZURE_RESOURCE_GROUP = 'TubesCloud'
-        AZURE_WEB_APP = 'joglo-lontar-app'
+        AZURE_WEB_APP = 'joglo-prembun-app'
         GITHUB_REPO = 'https://github.com/zahra853/cloud.git'
         PHP_VERSION = '8.2'
     }
@@ -121,10 +121,10 @@ pipeline {
         success {
             echo '✅ Pipeline completed successfully!'
             emailext (
-                subject: "✅ Deployment Success: Joglo Lontar App",
+                subject: "✅ Deployment Success: Joglo Prembun App",
                 body: """
                     <h2>🎉 Deployment Successful!</h2>
-                    <p><strong>Application:</strong> Joglo Lontar Cafe</p>
+                    <p><strong>Application:</strong> Joglo Prembun</p>
                     <p><strong>Environment:</strong> Production</p>
                     <p><strong>URL:</strong> <a href="https://${AZURE_WEB_APP}.azurewebsites.net">https://${AZURE_WEB_APP}.azurewebsites.net</a></p>
                     <p><strong>Build:</strong> #${BUILD_NUMBER}</p>
@@ -137,10 +137,10 @@ pipeline {
         failure {
             echo '❌ Pipeline failed!'
             emailext (
-                subject: "❌ Deployment Failed: Joglo Lontar App",
+                subject: "❌ Deployment Failed: Joglo Prembun App",
                 body: """
                     <h2>💥 Deployment Failed!</h2>
-                    <p><strong>Application:</strong> Joglo Lontar Cafe</p>
+                    <p><strong>Application:</strong> Joglo Prembun</p>
                     <p><strong>Build:</strong> #${BUILD_NUMBER}</p>
                     <p><strong>Error:</strong> Check Jenkins logs for details</p>
                     <p><strong>Jenkins URL:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>
