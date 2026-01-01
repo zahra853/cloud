@@ -73,17 +73,30 @@ pipeline {
                     # Create deployment package
                     zip -r deploy.zip . -x "*.git*" -x "node_modules/*" -x "tests/*" -x "*.zip"
                     
-                    echo "Deployment package created. Manual deploy required via Azure Portal or CLI."
-                    echo "Package size:"
-                    ls -lh deploy.zip
+                    echo "Deploying to Azure App Service..."
+                    curl -X POST \
+                        -u "$joglo-prembun-app:fiz0nZz1LAhdxzeL0hhBP4ZspS5o1clMfsmTyXDk0jTyTkJCHWD83Kmk72QJ" \
+                        --data-binary @deploy.zip \
+                        "https://joglo-prembun-app.scm.azurewebsites.net/api/zipdeploy"
+                    
+                    echo "Deployment completed!"
                 '''
             }
         }
         
         stage('Health Check') {
             steps {
-                echo '🏥 Build completed successfully!'
-                echo "Ready for deployment to: https://joglo-prembun-app.azurewebsites.net"
+                echo '🏥 Running health check...'
+                sh '''
+                    sleep 30
+                    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://joglo-prembun-app.azurewebsites.net)
+                    echo "HTTP Status: $HTTP_STATUS"
+                    if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "302" ]; then
+                        echo "✅ App is running!"
+                    else
+                        echo "⚠️ App returned status $HTTP_STATUS"
+                    fi
+                '''
             }
         }
     }
