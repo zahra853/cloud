@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        AZURE_RESOURCE_GROUP = 'TubesCC'
-        AZURE_WEB_APP = 'tubescc-webapp'
+        AZURE_RESOURCE_GROUP = 'TubesCloud'
+        AZURE_WEB_APP = 'joglo-prembun-app'
         GITHUB_REPO = 'https://github.com/zahra853/cloud.git'
         PHP_VERSION = '8.2'
     }
@@ -78,7 +78,7 @@ pipeline {
                         curl -X POST \
                             -u "$AZURE_USER:$AZURE_PASS" \
                             --data-binary @deploy.zip \
-                            "https://tubescc-webapp.scm.azurewebsites.net/api/zipdeploy"
+                            "https://joglo-prembun-app.scm.azurewebsites.net/api/zipdeploy"
                         
                         echo "Deployment completed!"
                     '''
@@ -91,7 +91,7 @@ pipeline {
                 echo '🏥 Running health check...'
                 sh '''
                     sleep 30
-                    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://tubescc-webapp.azurewebsites.net)
+                    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://joglo-prembun-app.azurewebsites.net)
                     echo "HTTP Status: $HTTP_STATUS"
                     if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "302" ]; then
                         echo "✅ App is running!"
