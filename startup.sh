@@ -1,28 +1,40 @@
 #!/bin/bash
 
-# Copy nginx config to enable Laravel public folder
-cp /home/site/wwwroot/default /etc/nginx/sites-available/default
+# 1. Configure Nginx Document Root to /public
+# NOTE: We use sed to modify the existing default config provided by Azure to preserve the correct fastcgi_pass upstream.
+# Do NOT overwrite the file with a custom one unless you know the exact upstream socket.
+sed -i 's|root /home/site/wwwroot;|root /home/site/wwwroot/public;|g' /etc/nginx/sites-available/default
 service nginx reload
 
+# 2. Navigate to app
 cd /home/site/wwwroot
 
-# Run package discovery (skipped during CI build)
+# 3. Create necessary directories to avoid "View path not found"
+mkdir -p storage/framework/sessions
+mkdir -p storage/framework/views
+mkdir -p storage/framework/cache
+chmod -R 775 storage bootstrap/cache
+
+# 4. Laravel Setup
+# Run package discovery
 php artisan package:discover --ansi
 
-# Setup Laravel environment & DB
-# Note: In Azure, app settings inject into env, so we might not strict need .env file copy if vars are set in App Service
-# But cp .env.example .env is safe fallback
+# Ensure env exists
 if [ ! -f .env ]; then
     cp .env.example .env
 fi
 
-# Run migrations with seeding
-php artisan migrate --seed --force
+# Run migrations (force for production)
+php artisan migrate --force
 
-# Clear and cache config
+# Optimize and Cache
+php artisan config:clear
+php artisan view:clear
+php artisan route:clear
+
 php artisan config:cache
-php artisan route:cache
 php artisan view:cache
+php artisan route:cache
 
-# Create storage link if not exists
+# Link storage
 php artisan storage:link 2>/dev/null || true
