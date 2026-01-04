@@ -50,7 +50,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        @if($user['avatar'])
+                                        @if(!empty($user['avatar']))
                                             <img class="h-10 w-10 rounded-full" src="{{ $user['avatar'] }}" alt="{{ $user['name'] }}">
                                         @else
                                             <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
