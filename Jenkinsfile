@@ -2,8 +2,8 @@ pipeline {
     agent any
     
     environment {
-        AZURE_RESOURCE_GROUP = 'TubesCC'
-        AZURE_WEB_APP = 'tubescc-webapp'
+        AZURE_RESOURCE_GROUP = 'cloudcomp'
+        AZURE_WEB_APP = 'joglo-lontar-app'
         GITHUB_REPO = 'https://github.com/zahra853/cloud.git'
         PHP_VERSION = '8.2'
     }
@@ -69,7 +69,7 @@ pipeline {
         stage('Deploy to Azure') {
             steps {
                 echo '🚀 Deploying to Azure App Service...'
-                withCredentials([usernamePassword(credentialsId: 'azure-deploy-creds', usernameVariable: 'AZURE_USER', passwordVariable: 'AZURE_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'azure-joglo-lontar-credentials', usernameVariable: 'AZURE_USER', passwordVariable: 'AZURE_PASS')]) {
                     sh '''
                         # Create deployment package
                         zip -r deploy.zip . -x "*.git*" -x "node_modules/*" -x "tests/*" -x "*.zip"
@@ -78,7 +78,7 @@ pipeline {
                         curl -X POST \
                             -u "$AZURE_USER:$AZURE_PASS" \
                             --data-binary @deploy.zip \
-                            "https://tubescc-webapp.scm.azurewebsites.net/api/zipdeploy"
+                            "https://joglo-lontar-app.scm.azurewebsites.net/api/zipdeploy"
                         
                         echo "Deployment completed!"
                     '''
@@ -91,7 +91,7 @@ pipeline {
                 echo '🏥 Running health check...'
                 sh '''
                     sleep 30
-                    HTTP_STATUS=$(curl -s -o /dev/null -w \"%{http_code}\" https://tubescc-webapp.azurewebsites.net)
+                    HTTP_STATUS=$(curl -s -o /dev/null -w \"%{http_code}\" https://joglo-lontar-app.azurewebsites.net)
                     echo "HTTP Status: $HTTP_STATUS"
                     if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "302" ]; then
                         echo "✅ App is running!"
@@ -111,10 +111,10 @@ pipeline {
         success {
             echo '✅ Pipeline completed successfully!'
             emailext (
-                subject: "✅ Deployment Success: Joglo Prembun App",
+                subject: "✅ Deployment Success: Joglo Lontar Cafe",
                 body: """
                     <h2>🎉 Deployment Successful!</h2>
-                    <p><strong>Application:</strong> Joglo Prembun</p>
+                    <p><strong>Application:</strong> Joglo Lontar Cafe</p>
                     <p><strong>Environment:</strong> Production</p>
                     <p><strong>URL:</strong> <a href="https://${AZURE_WEB_APP}.azurewebsites.net">https://${AZURE_WEB_APP}.azurewebsites.net</a></p>
                     <p><strong>Build:</strong> #${BUILD_NUMBER}</p>
@@ -127,10 +127,10 @@ pipeline {
         failure {
             echo '❌ Pipeline failed!'
             emailext (
-                subject: "❌ Deployment Failed: Joglo Prembun App",
+                subject: "❌ Deployment Failed: Joglo Lontar Cafe",
                 body: """
                     <h2>💥 Deployment Failed!</h2>
-                    <p><strong>Application:</strong> Joglo Prembun</p>
+                    <p><strong>Application:</strong> Joglo Lontar Cafe</p>
                     <p><strong>Build:</strong> #${BUILD_NUMBER}</p>
                     <p><strong>Error:</strong> Check Jenkins logs for details</p>
                     <p><strong>Jenkins URL:</strong> <a href="${BUILD_URL}">${BUILD_URL}</a></p>
