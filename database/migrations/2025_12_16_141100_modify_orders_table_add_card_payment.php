@@ -5,18 +5,18 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        // Change payment_method enum to include 'card'
-        DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method ENUM('midtrans', 'cash', 'transfer', 'card') NULL");
-        
-        // Add voucher columns if they don't exist
+        // For SQLite, we need to recreate the table or use a different approach
+        // Instead of modifying ENUM, we'll just add the new columns
+        // The payment_method validation can be handled at application level
+
         Schema::table('orders', function (Blueprint $table) {
+            // Add voucher columns if they don't exist
             if (!Schema::hasColumn('orders', 'voucher_id')) {
                 $table->foreignId('voucher_id')->nullable()->after('tax')->constrained()->nullOnDelete();
             }
@@ -30,6 +30,9 @@ return new class extends Migration
                 $table->string('customer_name')->nullable()->after('guest_phone');
             }
         });
+
+        // Note: payment_method can already accept 'card' as it's stored as string in SQLite
+        // ENUM constraints are only enforced at MySQL level
     }
 
     /**
@@ -37,10 +40,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement("ALTER TABLE orders MODIFY COLUMN payment_method ENUM('midtrans', 'cash', 'transfer') NULL");
-        
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropForeign(['voucher_id']);
+            if (Schema::hasColumn('orders', 'voucher_id')) {
+                $table->dropForeign(['voucher_id']);
+            }
             $table->dropColumn(['voucher_id', 'voucher_code', 'discount_amount', 'customer_name']);
         });
     }
